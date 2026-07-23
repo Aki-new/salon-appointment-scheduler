@@ -1,50 +1,67 @@
-#  Salon Appointment Scheduler (freeCodeCamp Project)
+# ✂️ Salon Appointment Scheduler (PostgreSQL + Bash CLI)
 
-Este proyecto es parte del programa de certificación **Relational Database** de [freeCodeCamp](https://www.freecodecamp.org/). Consiste en la automatización interactiva de una barbería/salón de belleza mediante un script Bash integrado con una base de datos relacional en PostgreSQL.
-
-## 🚀 Características Clave
-
-* **Diseño Relacional Robusto**: Esquema en PostgreSQL estructurado en 3 tablas (`customers, services, appointments`) aplicando claves primarias autoincrementables, claves foráneas para integridad referencial y restricciones de unicidad (`UNIQUE`) en teléfonos.
-
-* **Menú Interactivo y Recursivo**: Interfaz por consola escrita en Bash que valida en tiempo real las entradas del usuario. Si selecciona una opción inexistente, el sistema reintenta la navegación fluidamente mediante llamadas recursivas.
-
-* **Registro Automatizado de Clientes**: Lógica condicional que detecta si el teléfono ingresado pertenece a un cliente existente o si requiere registrarlo por primera vez antes de agendar.
-
-* **Procesamiento de Datos Nivel Shell**: Uso de tubos (pipes), redefinición de separadores de campo (`IFS`) y consultas SQL en tiempo de ejecución utilizando el CLI de psql con banderas optimizadas (`-t --no-align`).
+Aplicación interactiva por línea de comandos (CLI) escrita en Bash y conectada a PostgreSQL para la gestión dinámica de clientes y agendamiento de citas en un salón de belleza.
 
 ---
+
+## ⚡ Flujo de la Aplicación
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Cliente
+    participant CLI as Script Bash (salon.sh)
+    participant DB as PostgreSQL (salon.sql)
+
+    Cliente->>CLI: Selecciona un servicio
+    CLI->>Cliente: Solicita número de teléfono
+    CLI->>DB: Consulta si el cliente existe
+    alt Cliente nuevo
+        DB-->>CLI: No encontrado
+        CLI->>Cliente: Solicita nombre
+        CLI->>DB: Registra nuevo cliente
+    else Cliente registrado
+        DB-->>CLI: Nombre encontrado
+    end
+    CLI->>Cliente: Solicita hora de la cita
+    CLI->>DB: Registra la cita (appointments)
+    CLI->>Cliente: Muestra confirmación detallada
+```
+
+---
+
+## ✨ Características Clave
+* **Interface de Consola Interactiva:** Menús dinámicos con manejo de errores e insumos inválidos mediante funciones recursivas en Bash.
+* **Flujo de Registro Inteligente:** Verificación de clientes existentes vía número telefónico para evitar registros duplicados.
+* **Persistencia Relacional:** Gestión de tablas para servicios (`services`), clientes (`customers`) y citas (`appointments`) con claves foráneas.
+* **Formateo de Datos:** Limpieza de espacios en blanco sobrantes devueltos por psql para presentar mensajes claros al usuario.
 
 ## 🛠️ Tecnologías Utilizadas
+* Base de Datos: PostgreSQL
+* Lenguaje: Bash / Shell Scripting (`psql` CLI)
 
-| **Tecnología** | **Descripción**
-| --- | --- | 
-| **PostgreSQL** | Motor de base de datos relacional para la persistencia. |
-| **Bash Shell** | Entorno de comandos para la lógica e interfaz interactiva. |
-| **SQL** | Consultas nativas de lectura (`SELECT`) e inserción (`INSERT`). |
-
----
-
-## 📂 Estructura de la Base de Datos
-```plaintext
-salon (Database)
- ├── services      (service_id [PK], name)
- ├── customers     (customer_id [PK], phone [UNIQUE], name)
- └── appointments  (appointment_id [PK], customer_id [FK], service_id [FK], time)
+## 🚀 Instalación y Ejecución
+### Prerrequisitos
+Tener instalado y configurado PostgreSQL en tu entorno local.
+### Pasos
+1. **Clonar el repositorio:**
+```bash
+  git clone https://github.com/Aki-new/salon-appointment-scheduler.git
+  cd salon-appointment-scheduler
 ```
+2. **Crear e importar el esquema de la base de datos:**
+```bash
+ psql -U postgres < salon.sql
+```
+3. **Dar permisos de ejecución e iniciar la aplicación:**
+```bash
+ chmod +x salon.sh
+ ./salon.sh
+```
+
 ---
 
-## 💻 **Ejecución del Proyecto**
+## 📜 Créditos y Reconocimientos
 
-1. **Asegúrate de tener PostgreSQL ejecutándose y la base de datos `salon` creada:**
-   ```bash
-   psql -U freecodecamp -d salon < salon.sql
-    ```
-2. **Otorga permisos de ejecución al script:**
-   ```bash
-   chmod +x salon.sh
-   ```
-
-3. **Ejecuta el agendador:**
-   ```bash
-   ./salon.sh
-   ```
+* **Origen de la consigna / dataset:** Este proyecto es uno de los desafíos requeridos para la obtención de la **Certificación de Bases de Datos Relacionales** de [freeCodeCamp](https://www.freecodecamp.org/).
+* **Implementación:** La lógica de scripts en Bash (`insert_data.sh`), la estructuración del esquema PostgreSQL (`worldcup.sql`) y la elaboración de consultas analíticas (`queries.sh`) fueron desarrolladas por completo como resolución individual al problema planteado.
